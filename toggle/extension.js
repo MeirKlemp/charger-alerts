@@ -1,59 +1,63 @@
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as QuickSettings from 'resource:///org/gnome/shell/ui/quickSettings.js';
 
-const SERVICE_NAME = 'charger-alert.service';
+const SERVICE = 'charger-alerts.service';
 
 const ChargerToggle = GObject.registerClass(
-class ChargerToggle extends QuickSettings.QuickMenuToggle {
+class ChargerToggle extends QuickSettings.QuickToggle {
     _init() {
         super._init({
             title: 'Charger Alerts',
-            iconName: 'battery-good-symbolic',
+            iconName: 'battery-good-charging-symbolic',
             toggleMode: true,
         });
 
         this.checked = false;
+
         this._sync();
 
         this.connect('clicked', () => {
-            this.checked = !this.checked;
-            this._apply();
+            this._toggleService(this.checked);
+            this._sync();
         });
-    }
-
-    _run(argv) {
-        Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
     }
 
     _sync() {
         try {
-            let proc = Gio.Subprocess.new(
-                ['systemctl', '--user', 'is-active', SERVICE_NAME],
+            const proc = Gio.Subprocess.new(
+                ['systemctl', '--user', 'is-active', SERVICE],
                 Gio.SubprocessFlags.STDOUT_PIPE
             );
 
             proc.communicate_utf8_async(null, null, (p, res) => {
-                let [, out] = p.communicate_utf8_finish(res);
-                this.checked = out.trim() === 'active';
-                this.subtitle = this.checked ? 'Enabled' : 'Disabled';
+                try {
+                    let [, out] = p.communicate_utf8_finish(res);
+                    this.checked = out.trim() === 'active';
+                } catch (e) {
+                    logError(e);
+                }
             });
         } catch (e) {
             logError(e);
         }
     }
 
-    _apply() {
-        this._run([
-            'systemctl',
-            '--user',
-            this.checked ? 'start' : 'stop',
-            SERVICE_NAME
-        ]);
-
-        this.subtitle = this.checked ? 'Enabled' : 'Disabled';
+    _toggleService(start) {
+        try {
+            const proc = Gio.Subprocess.new([
+                    'systemctl', '--user',
+                    start ? 'start' : 'stop',
+                    SERVICE
+                ],
+                Gio.SubprocessFlags.NONE
+            );
+        } catch (e) {
+            logError(e);
+        }
     }
 });
 
@@ -67,17 +71,17 @@ class ChargerIndicator extends QuickSettings.SystemIndicator {
     }
 });
 
-let indicator;
+export default class ChargerExtension extends Extension {
+    enable() {
+        this._indicator = new ChargerIndicator();
 
-export function init() {}
+        Main.panel.statusArea.quickSettings.addExternalIndicator(
+            this._indicator
+        );
+    }
 
-export function enable() {
-    indicator = new ChargerIndicator();
-
-    Main.panel.statusArea.quickSettings.addExternalIndicator(indicator);
-}
-
-export function disable() {
-    indicator?.destroy();
-    indicator = null;
+    disable() {
+        this._indicator?.destroy();
+        this._indicator = null;
+    }
 }
