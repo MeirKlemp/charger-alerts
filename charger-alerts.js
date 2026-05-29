@@ -4,8 +4,8 @@ import Gdk from 'gi://Gdk?version=4.0';
 import Gtk from 'gi://Gtk?version=4.0';
 
 const STATUS_DISCHARGING = "Discharging";
-const BATTERY_MIN = 80;
-const BATTERY_MAX = 100;
+const BATTERY_MIN = 40;
+const BATTERY_MAX = 90;
 const SLEEP_SECONDS = 60;
 const TIMES_TILL_GIVEUP = 10;
 
@@ -54,12 +54,12 @@ function check_battery() {
         console.log("alert to unplug:", alert_to_unplug);
 
         if (alert_to_plug && charging_status === STATUS_DISCHARGING && battery_level <= BATTERY_MIN) {
-            console.log("Showing dialog because battery is 80%")
-            show_dialog("Battery is at 80%. Please plug in the charger.");
+            console.log("Showing dialog because battery is", battery_level + "%");
+            show_dialog("Battery is at " + battery_level + "%. Please plug in the charger.");
             alert_to_plug = false;
         } else if (alert_to_unplug && charging_status !== STATUS_DISCHARGING && battery_level >= BATTERY_MAX) {
-            console.log("Showing dialog because battery is 100%")
-            show_dialog("Battery is at 100%. Please unplug the charger.");
+            console.log("Showing dialog because battery is", battery_level + "%");
+            show_dialog("Battery is at " + battery_level + "%. Please unplug the charger.");
             alert_to_unplug = false;
         }
 
