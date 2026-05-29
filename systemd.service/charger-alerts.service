@@ -1,0 +1,12 @@
+[Unit]
+Description=Utility that alerts you to plug or unplug your charger
+
+[Service]
+WorkingDirectory=%h/.local/share/charger-alerts
+ExecStart=/usr/bin/gjs -m charger-alerts.js
+Restart=always
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=%t
+
+[Install]
+WantedBy=default.target
