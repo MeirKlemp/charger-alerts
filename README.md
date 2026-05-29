@@ -13,22 +13,24 @@ A lightweight GNOME utility that alerts you when to plug in or unplug your charg
 
 ---
 
-## 📸 Screenshots
-
-Alert in action:
-![Alert](images/alert.png)
-
-GNOME toggle extension:
-![Toggle](images/toggle.png)
-
----
-
 ## 🚀 Installation
 
 ```bash
 chmod +x simple-install.sh
 ./simple-install.sh
 ```
+
+---
+
+## 📸 Screenshots
+
+Alert in action:
+
+![Alert](images/alert.png)
+
+GNOME toggle extension:
+
+![Toggle](images/toggle.png)
 
 ---
 
