@@ -1,0 +1,7 @@
+{
+    "uuid": "charger-alerts@meirklemp",
+    "name": "Charger Alerts",
+    "description": "Alerts to plug or unplug the charger.",
+    "version": 1,
+    "shell-version": ["50"]
+}
