@@ -69,6 +69,11 @@ class ChargerIndicator extends QuickSettings.SystemIndicator {
         this._toggle = new ChargerToggle();
         this.quickSettingsItems.push(this._toggle);
     }
+
+    destroy() {
+        this.quickSettingsItems.forEach(item => item.destroy());
+        super.destroy();
+    }
 });
 
 export default class ChargerExtension extends Extension {
